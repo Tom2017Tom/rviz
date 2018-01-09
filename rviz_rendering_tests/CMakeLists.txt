@@ -36,12 +36,24 @@ if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
   find_package(ament_index_cpp REQUIRED)
 
-  # TODO(wjwwood): reenable when this test is can run on CI
-  # ament_add_gtest(test_rviz_rendering_tests test/test_rviz_ogre_media_exports.cpp)
-  # if(TARGET test_rviz_rendering_tests)
-  #   target_include_directories(test_rviz_rendering_tests PUBLIC src/rviz_rendering_tests)
-  #   target_link_libraries(test_rviz_rendering_tests ament_index_cpp::ament_index_cpp)
-  # endif()
+  if($ENV{DISPLAY})
+    set(DISPLAYPRESENT TRUE)
+  else()
+    set(DISPLAYPRESENT FALSE)
+  endif()
+
+  if(WIN32 OR APPLE OR DISPLAYPRESENT)
+    message(STATUS "Enabling tests requiring a display")
+
+    ament_add_gtest(test_rviz_rendering_tests
+      test/test_rviz_ogre_media_exports.cpp)
+    if(TARGET test_rviz_rendering_tests)
+      target_include_directories(test_rviz_rendering_tests
+        PUBLIC src/rviz_rendering_tests)
+      target_link_libraries(test_rviz_rendering_tests
+        ament_index_cpp::ament_index_cpp)
+    endif()
+  endif()
 endif()
 
 ament_package()
